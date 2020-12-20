@@ -1,4 +1,4 @@
-модуль github.com/GVG/l3
+модуль github.com/SofiaMazur/razur_lab_3
 
 перейти 1.13
 
