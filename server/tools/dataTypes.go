@@ -1,35 +1,30 @@
-инструменты пакета
+package tools
 
-// Пользовательская структура JSON
-type  User  struct {
-	Id         int       `json:" - "`
-	 Строка  имени `json:" name "`
-	Интересы [] строка  `json:" интересы "`
+type User struct {
+	Id        int      `json:"-"`
+	Name string `json:"name"`
+	Interests []string `json:"interests"`
 }
 
-// Структура форума JSON
-type  Forum  struct {
-	Id       int     `json:" - "`
-	 Строка  имени `json:" name "`
-	 Строка  темы `json:" topic "`
-	Users [] строка  `json:" users "`
+type Site struct {
+	Id      int    `json:"-"`
+	Name string `json:"name"`
+	Topic string `json: "topic"`
+	Users []string `json:"users"`
 }
 
-// Структура JSON форумов
-type  Forums  struct {
-	ForumsArr [] * Форум  `json:" форумы "`
+type Sites struct {
+	ForumsArr []*Forum `json:"forums"`
 }
 
-// Структура ResponseName JSON
-type  ResponseName  struct {
-	 Строка  имени `json:" name "`
+type ResponseName struct {
+	Name string `json:"name"`
 }
 
-// Массив пользователей
-type  Users  struct {
-	UsersArr [] * Пользователь  `json:" users "`
+type Users struct {
+	UsersArr []*User `json:"users"`
 }
 
-type  errorObject  struct {
-	 Строка  сообщения `json:" message "`
+type errorObject struct {
+	Message string `json:"message"`
 }
