@@ -9,12 +9,12 @@ import (
 )
 
 func addSite(db *gs.UniqueStore, rw http.ResponseWriter, req *http.Request) {
-	var forum tools.Site
+	var site tools.Site
 	if err := json.NewDecoder(req.Body).Decode(&site); err != nil {
 		tools.WriteJsonBadRequest(rw, err.Error())
 		return
 	}
-	if err := db.CreateForum(site.Name, site.Topic); err != nil {
+	if err := db.CreateSite(site.Name, site.Topic); err != nil {
 		tools.WriteJsonBadRequest(rw, err.Error())
 	} else {
 		rw.WriteHeader(http.StatusCreated)
