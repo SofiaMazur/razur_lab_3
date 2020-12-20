@@ -1,7 +1,7 @@
 -- Create tables.
-	DROP TABLE IF EXISTS usersList;
-	DROP TABLE IF EXISTS forums;
-	DROP TABLE IF EXISTS interestList;
+	DROP TABLE IF EXISTS usersCatalog;
+	DROP TABLE IF EXISTS sites;
+	DROP TABLE IF EXISTS interestCatalog;
 	DROP TABLE IF EXISTS users;
 	CREATE TABLE users
 	(
@@ -9,7 +9,7 @@
 		name VARCHAR(50) NOT NULL UNIQUE
 	);
 
-	CREATE TABLE interestList
+	CREATE TABLE interestCatalog
 	(
 		id   SERIAL PRIMARY KEY,
 		interest VARCHAR(50) NULL,
@@ -20,19 +20,19 @@
 			ON UPDATE CASCADE
 	);
 
-	CREATE TABLE forums
+	CREATE TABLE sites
 	(
 		id   SERIAL PRIMARY KEY,
 		name VARCHAR(50) NOT NULL UNIQUE,
-		topicKeyword VARCHAR(50) NOT NULL UNIQUE
+		theme VARCHAR(50) NOT NULL UNIQUE
 	);
 
-	CREATE TABLE usersList
+	CREATE TABLE usersCatalog
 	(
 		id   SERIAL PRIMARY KEY,
-		forumsID INT NOT NULL,
-		FOREIGN KEY (forumsID)
-		REFERENCES forums(id)
+		sitesID INT NOT NULL,
+		FOREIGN KEY (sitesID)
+		REFERENCES sites(id)
 			ON DELETE CASCADE
 			ON UPDATE CASCADE,
 		userID INT NULL,
@@ -43,18 +43,18 @@
 	);
 
 	-- Insert demo data.
-	INSERT INTO users (name) VALUES ('Bob');
-	INSERT INTO users (name) VALUES ('Nick');
-	INSERT INTO users (name) VALUES ('Simon');
-	INSERT INTO interestList (interest, userID) VALUES ('Jojo References', 1);
-	INSERT INTO interestList (interest, userID) VALUES ('Games', 1);
-	INSERT INTO interestList (interest, userID) VALUES ('Games', 2);
-	INSERT INTO interestList (interest, userID) VALUES ('Books', 3);
-	INSERT INTO forums (name, topicKeyword) VALUES ('Jojo References', 'jojo bizzare adventure');
-	INSERT INTO forums (name, topicKeyword) VALUES ('Movies fan', 'Movies');
-	INSERT INTO forums (name, topicKeyword) VALUES ('Book enjoyer', 'Books');
-	INSERT INTO forums (name, topicKeyword) VALUES ('Gaming', 'Games');
-	INSERT INTO usersList (forumsID, userID) VALUES (1, 1);
-	INSERT INTO usersList (forumsID, userID) VALUES (4, 1);
-	INSERT INTO usersList (forumsID, userID) VALUES (4, 2);
-	INSERT INTO usersList (forumsID, userID) VALUES (3, 3);
+	INSERT INTO users (name) VALUES ('Franko');
+	INSERT INTO users (name) VALUES ('Dimon');
+	INSERT INTO users (name) VALUES ('Tom');
+	INSERT INTO interestCatalog (interest, userID) VALUES ('Films', 2);
+	INSERT INTO interestCatalog (interest, userID) VALUES ('Films', 1);
+	INSERT INTO interestCatalog (interest, userID) VALUES ('Magazines', 3);
+	INSERT INTO interestCatalog (interest, userID) VALUES ('Magazines', 3);
+	INSERT INTO sites (name, theme) VALUES ('Anime', 'Naruto');
+	INSERT INTO sites (name, theme) VALUES ('TV-show', 'Supernatural');
+	INSERT INTO sites (name, theme) VALUES ('Books', 'Adventure books');
+	INSERT INTO sites (name, theme) VALUES ('Films', 'Marvel');
+	INSERT INTO usersCatalog (sitesID, userID) VALUES (2, 1);
+	INSERT INTO usersCatalog (sitesID, userID) VALUES (2, 2);
+	INSERT INTO usersCatalog (sitesID, userID) VALUES (4, 4);
+	INSERT INTO usersCatalog (sitesID, userID) VALUES (3, 3);
