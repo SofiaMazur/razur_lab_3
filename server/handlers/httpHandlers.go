@@ -27,9 +27,9 @@ func (h *Handlers) HandleUsers(rw http.ResponseWriter, req *http.Request) {
 // HandleForums for POST and GET methods
 func (h *Handlers) HandleForums(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
-		getForums(h.db, rw, req)
+		getSites(h.db, rw, req)
 	} else if req.Method == "POST" {
-		addForum(h.db, rw, req)
+		addSite(h.db, rw, req)
 	} else {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
 	}
@@ -53,8 +53,8 @@ func (h *Handlers) GetUser(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// GetForum for POST method
-func (h *Handlers) GetForum(rw http.ResponseWriter, req *http.Request) {
+// GetSite for POST method
+func (h *Handlers) GetSite(rw http.ResponseWriter, req *http.Request) {
 	if req.Method != "POST" {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -64,7 +64,7 @@ func (h *Handlers) GetForum(rw http.ResponseWriter, req *http.Request) {
 		tools.WriteJsonBadRequest(rw, err.Error())
 		return
 	}
-	if res, err := h.db.FindForumByName(resName.Name); err != nil {
+	if res, err := h.db.FindSiteByName(resName.Name); err != nil {
 		tools.WriteJsonBadRequest(rw, err.Error())
 	} else {
 		tools.WriteJsonOk(rw, res)
