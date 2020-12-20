@@ -8,21 +8,21 @@ import (
 	gs "github.com/SofiaMazur/razur_lab_3/server/uniqueStore"
 )
 
-func addForum(db *gs.UniqueStore, rw http.ResponseWriter, req *http.Request) {
-	var forum tools.Forum
-	if err := json.NewDecoder(req.Body).Decode(&forum); err != nil {
+func addSite(db *gs.UniqueStore, rw http.ResponseWriter, req *http.Request) {
+	var forum tools.Site
+	if err := json.NewDecoder(req.Body).Decode(&site); err != nil {
 		tools.WriteJsonBadRequest(rw, err.Error())
 		return
 	}
-	if err := db.CreateForum(forum.Name, forum.Topic); err != nil {
+	if err := db.CreateForum(site.Name, site.Topic); err != nil {
 		tools.WriteJsonBadRequest(rw, err.Error())
 	} else {
 		rw.WriteHeader(http.StatusCreated)
 	}
 }
 
-func getForums(db *gs.UniqueStore, rw http.ResponseWriter, req *http.Request) {
-	if res, err := db.ListForums(); err != nil {
+func getSites(db *gs.UniqueStore, rw http.ResponseWriter, req *http.Request) {
+	if res, err := db.ListSites(); err != nil {
 		tools.WriteJsonInternalError(rw, err.Error())
 	} else {
 		tools.WriteJsonOk(rw, res)
