@@ -1,200 +1,200 @@
-пакет uniqueStore
+package uniqueStore
 
-импорт (
-	"база данных / sql"
+import (
+	"database/sql"
 	"fmt"
-	"github.com/GVG/l3/server/tools"
+	"github.com/SofiaMazur/razur_lab_3/server/tools"
 	_ "github.com/lib/pq"
 )
 
-type  ForumStore  struct {
-	Db  * sql. БД
+type ForumStore struct {
+	Db *sql.DB
 }
 
-func  NewForumStore ( db  * sql. DB ) * ForumStore {
-	возврат  и ForumStore { Db : db }
+func NewForumStore(db *sql.DB) *ForumStore {
+	return &ForumStore{Db: db}
 }
 
-func ( s  * ForumStore ) ListForums () ( * tools. Forums , error ) {
-	строк , err  : =  s . Дб . Запрос ( «ВЫБРАТЬ * ИЗ форумов» )
-	if  err  ! =  nil {
-		вернуть  ноль , ошибиться
+func (s *ForumStore) ListForums() (*tools.Forums, error) {
+	rows, err := s.Db.Query("SELECT * FROM forums")
+	if err != nil {
+		return nil, err
 	}
 
-	отложить  строки . Закрыть ()
+	defer rows.Close()
 
-	var  res [] * tools. Форум
-	для  рядов . Next () {
-		var  f инструменты. Форум
-		если  ошибка  : =  строк . Сканировать ( & f . Идентификатор , & f . Имя , & f . Тема ); err  ! =  nil {
-			вернуть  ноль , ошибиться
+	var res []*tools.Forum
+	for rows.Next() {
+		var f tools.Forum
+		if err := rows.Scan(&f.Id, &f.Name, &f.Topic); err != nil {
+			return nil, err
 		}
-		res  =  append ( res , & f )
+		res = append(res, &f)
 	}
 
-	var  fullForums [] * tools. Форум
-	if  res  ==  nil {
-		fullForums  =  make ([] * tools. Forum , 0 )
+	var fullForums []*tools.Forum
+	if res == nil {
+		fullForums = make([]*tools.Forum, 0)
 	} else {
-		для  i  : =  0 ; я  <  len ( разрешение ); i ++ {
-			пользователи , err  : =  s . GetForumUsersByID ( res [ i ]. Id )
-			if  err  ! =  nil {
-				вернуть  ноль , ошибиться
+		for i := 0; i < len(res); i++ {
+			users, err := s.GetForumUsersByID(res[i].Id)
+			if err != nil {
+				return nil, err
 			}
-			fullForum  : = инструменты. Forum {
-				Id :     res [ i ]. Id ,
-				Имя :   res [ i ]. Имя ,
-				Тема : res [ i ]. Тема ,
-				Пользователи : users }
-			fullForums  =  Append ( fullForums , & fullForum )
+			fullForum := tools.Forum{
+				Id:    res[i].Id,
+				Name:  res[i].Name,
+				Topic: res[i].Topic,
+				Users: users}
+			fullForums = append(fullForums, &fullForum)
 		}
 	}
 
-	результат  : =  & tools. Форумы { fullForums }
-	вернуть  результат , ошибка
+	result := &tools.Forums{fullForums}
+	return result, err
 }
 
-func ( s  * ForumStore ) FindForumByName ( строка имени  ) ( * tools. Forums , error ) {
-	var  textError  строка
-	var  err  error
-	var  fullForums [] * tools. Форум
+func (s *ForumStore) FindForumByName(name string) (*tools.Forums, error) {
+	var textError string
+	var err error
+	var fullForums []*tools.Forum
 
-	if  len ( name ) ==  0 {
-		textError  =  "Название форума не указано"
-		err  =  fmt . Errorf ( textError )
-		fullForums  =  make ([] * tools. Forum , 0 )
-		вернуть  ноль , ошибиться
+	if len(name) == 0 {
+		textError = "Forum name is not provided"
+		err = fmt.Errorf(textError)
+		fullForums = make([]*tools.Forum, 0)
+		return nil, err
 	}
-	строк , err  : =  s . Дб . Запрос ( `ВЫБРАТЬ * ИЗ форумов, где имя = $ 1` , имя )
-	if  err  ! =  nil {
-		textError  =  "Такого форума нет"
-		err  =  fmt . Errorf ( textError )
-		вернуть  ноль , ошибиться
+	rows, err := s.Db.Query(`SELECT * FROM forums where name = $1`, name)
+	if err != nil {
+		textError = "There is no such forum"
+		err = fmt.Errorf(textError)
+		return nil, err
 	}
 
-	отложить  строки . Закрыть ()
+	defer rows.Close()
 
-	var  res [] * tools. Форум
-	для  рядов . Next () {
-		var  f инструменты. Форум
-		если  err  =  rows . Сканировать ( & f . Идентификатор , & f . Имя , & f . Тема ); err  ! =  nil {
-			вернуть  ноль , ошибиться
+	var res []*tools.Forum
+	for rows.Next() {
+		var f tools.Forum
+		if err = rows.Scan(&f.Id, &f.Name, &f.Topic); err != nil {
+			return nil, err
 		}
-		res  =  append ( res , & f )
+		res = append(res, &f)
 	}
-	if  res  ==  nil {
-		textError  =  "Нет такого форума"
-		err  =  fmt . Errorf ( textError )
-		вернуть  ноль , ошибиться
+	if res == nil {
+		textError = "No such forum"
+		err = fmt.Errorf(textError)
+		return nil, err
 	}
-	для  i  : =  0 ; я  <  len ( разрешение ); i ++ {
-		пользователи , err  : =  s . GetForumUsersByID ( res [ i ]. Id )
-		if  err  ! =  nil {
-			вернуть  ноль , ошибиться
+	for i := 0; i < len(res); i++ {
+		users, err := s.GetForumUsersByID(res[i].Id)
+		if err != nil {
+			return nil, err
 		}
-		fullForum  : = инструменты. Forum {
-			Id :     res [ i ]. Id ,
-			Имя :   res [ i ]. Имя ,
-			Тема : res [ i ]. Тема ,
-			Пользователи : users }
-		fullForums  =  Append ( fullForums , & fullForum )
+		fullForum := tools.Forum{
+			Id:    res[i].Id,
+			Name:  res[i].Name,
+			Topic: res[i].Topic,
+			Users: users}
+		fullForums = append(fullForums, &fullForum)
 	}
 
-	результат  : =  & tools. Форумы { fullForums }
-	вернуть  результат , ноль
+	result := &tools.Forums{fullForums}
+	return result, nil
 }
 
-func ( s  * ForumStore ) FindForumByTopic ( строка имени  ) ([] * tools. Forum , error ) {
-	if  len ( name ) ==  0 {
-		возврат  ноль , fmt . Errorf ( «Название темы не указано» )
+func (s *ForumStore) FindForumByTopic(name string) ([]*tools.Forum, error) {
+	if len(name) == 0 {
+		return nil, fmt.Errorf("Topic name is not provided")
 	}
-	строк , err  : =  s . Дб . Запрос ( `SELECT * FROM форумов, где topicKeyword = $ 1` , имя )
-	if  err  ! =  nil {
-		вернуть  ноль , ошибиться
+	rows, err := s.Db.Query(`SELECT * FROM forums where topicKeyword = $1`, name)
+	if err != nil {
+		return nil, err
 	}
 
-	отложить  строки . Закрыть ()
+	defer rows.Close()
 
-	var  res [] * tools. Форум
-	для  рядов . Next () {
-		var  f инструменты. Форум
-		если  ошибка  : =  строк . Сканировать ( & f . Идентификатор , & f . Имя , & f . Тема ); err  ! =  nil {
-			вернуть  ноль , ошибиться
+	var res []*tools.Forum
+	for rows.Next() {
+		var f tools.Forum
+		if err := rows.Scan(&f.Id, &f.Name, &f.Topic); err != nil {
+			return nil, err
 		}
-		res  =  append ( res , & f )
+		res = append(res, &f)
 	}
-	if  res  ==  nil {
-		res  =  make ([] * tools. Forum , 0 )
-		возврат  res , fmt . Errorf ( «такого форума нет» )
+	if res == nil {
+		res = make([]*tools.Forum, 0)
+		return res, fmt.Errorf("no such forum")
 	}
-	return  res , nil
+	return res, nil
 }
 
-func ( s  * ForumStore ) CreateForum ( name , topicKeyword  string ) error {
-	if  len ( name ) ==  0 {
-		вернуть  fmt . Errorf ( "Название форума не указано" )
+func (s *ForumStore) CreateForum(name, topicKeyword string) error {
+	if len(name) == 0 {
+		return fmt.Errorf("Forum name is not provided")
 	}
-	if  len ( topicKeyword ) ==  0 {
-		вернуть  fmt . Errorf ( "Название ключевого слова темы не указано" )
+	if len(topicKeyword) == 0 {
+		return fmt.Errorf("Topic keyword name is not provided")
 	}
-	_ , ошибка  : =  s . Дб . Exec ( `INSERT INTO forum (name, topicKeyword) VALUES ($ 1, $ 2)` , name , topicKeyword )
-	if  err  ! =  nil {
-		вернуть  fmt . Errorf ( «Форум с таким названием или темой уже существует» )
+	_, err := s.Db.Exec(`INSERT INTO forums (name, topicKeyword) VALUES ($1, $2)`, name, topicKeyword)
+	if err != nil {
+		return fmt.Errorf("Forum with this name or topic already exists")
 	}
-	форумы , err  : =  s . FindForumByName ( имя )
-	_ , ошибка  =  s . Дб . Exec ( `INSERT INTO Список пользователей задается (forumsID) VALUES ($ 1)` , форумы . ForumsArr [ 0 ]. Id )
-	вернуть  ошибку
+	forums, err := s.FindForumByName(name)
+	_, err = s.Db.Exec(`INSERT INTO usersList (forumsID) VALUES ($1)`, forums.ForumsArr[0].Id)
+	return err
 }
 
-func ( s  * ForumStore ) GetForumUsersByID ( id  int ) ([] строка , ошибка ) {
-	if  id  <  1 {
-		возврат  ноль , fmt . Errorf ( «ID неверный» )
+func (s *ForumStore) GetForumUsersByID(id int) ([]string, error) {
+	if id < 1 {
+		return nil, fmt.Errorf("ID is incorrect")
 	}
-	строк , err  : =  s . Дб . Запрос ( `
-	Выбрать
+	rows, err := s.Db.Query(`
+	select
 		users.name
-	из
-		форумы
-	оставил присоединиться
+	from
+		forums
+	left join
 		usersList
-	на
-		usersList.forumsID = forum.id
-	оставил присоединиться
-		пользователи
-	на
+	on
+		usersList.forumsID = forums.id
+	left join
+		users
+	on
 		users.id = usersList.userID
-	где
-		forum.id = 1 доллар США
-	ГРУППА ПО
+	where
+		forums.id = $1
+	GROUP BY
 		users.id
-	HAVING users.id не равен NULL
-	` ,
-		id )
+	HAVING users.id is not NULL
+	`,
+		id)
 
-	if  err  ! =  nil {
-		вернуть  ноль , ошибиться
+	if err != nil {
+		return nil, err
 	}
 
-	отложить  строки . Закрыть ()
+	defer rows.Close()
 
-	var  res [] строка
-	для  рядов . Next () {
-		var  u  строка
-		если  ошибка  : =  строк . Сканировать ( & u ); err  ! =  nil {
-			вернуть  ноль , ошибиться
+	var res []string
+	for rows.Next() {
+		var u string
+		if err := rows.Scan(&u); err != nil {
+			return nil, err
 		}
-		if  u  ! =  "" {
-			res  =  добавить ( res , u )
+		if u != "" {
+			res = append(res, u)
 		}
 	}
-	if  res  ==  nil {
-		res  =  make ([] строка , 0 )
+	if res == nil {
+		res = make([]string, 0)
 	}
 
-	return  res , nil
+	return res, nil
 }
 
-func ( s  * ForumStore ) AddUserToForum ( idForum , idUser  int ) error {
-	_ , ошибка  : =  s . Дб . Exec ( `INSERT INTO usersList (forumID, userID) VALUES ($ 1, $ 2)` , idForum , idUser )
-	вернуть  ошибку
+func (s *ForumStore) AddUserToForum(idForum, idUser int) error {
+	_, err := s.Db.Exec(`INSERT INTO usersList (forumsID, userID) VALUES ($1, $2)`, idForum, idUser)
+	return err
 }
