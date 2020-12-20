@@ -1,32 +1,28 @@
-инструменты пакета
+package tools
 
-импорт (
-	"кодировка / json"
-	"журнал"
-	"net / http"
+import (
+	"encoding/json"
+	"log"
+	"net/http"
 )
 
-// WriteJsonOk отправляет ответ об ошибке 400 с объектом JSON, описывающим причину ошибки.
-func  WriteJsonBadRequest ( rw http. ResponseWriter , строка сообщения  ) {
-	writeJson ( rw , http . StatusBadRequest , & errorObject { Сообщение : сообщение })
+func WriteJsonBadRequest(rw http.ResponseWriter, message string) {
+	writeJson(rw, http.StatusBadRequest, &errorObject{Message: message})
 }
 
-// WriteJsonOk отправляет ответ с ошибкой 500.
-func  WriteJsonInternalError ( rw http. ResponseWriter , строка сообщения  ) {
-	writeJson ( rw , http . StatusInternalServerError , & errorObject { Сообщение : сообщение })
+func WriteJsonInternalError(rw http.ResponseWriter, message string) {
+	writeJson(rw, http.StatusInternalServerError, &errorObject{Message: message})
 }
 
-// WriteJsonOk отправляет ответ 200 клиенту, сериализуя входной объект в формате JSON.
-
-func  WriteJsonOk ( rw http. ResponseWriter , res  interface {}) {
-	writeJson ( rw , http . StatusOK , res )
+func WriteJsonOk(rw http.ResponseWriter, res interface{}) {
+	writeJson(rw, http.StatusOK, res)
 }
 
-func  writeJson ( rw http. ResponseWriter , status  int , res  interface {}) {
-	rw . Заголовок (). Установить ( "тип содержимого" , "приложение / json" )
-	rw . WriteHeader ( статус )
-	ошибка  : =  json . NewEncoder ( rw ). Кодировать ( разрешение )
-	if  err  ! =  nil {
-		журнал . Printf ( "Ошибка записи ответа:% s" , ERR )
+func writeJson(rw http.ResponseWriter, status int, res interface{}) {
+	rw.Header().Set("content-type", "application/json")
+	rw.WriteHeader(status)
+	err := json.NewEncoder(rw).Encode(res)
+	if err != nil {
+		log.Printf("Error writing response: %s", err)
 	}
 }
