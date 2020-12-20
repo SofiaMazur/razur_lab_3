@@ -7,146 +7,146 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type ForumStore struct {
+type SiteStore struct {
 	Db *sql.DB
 }
 
-func NewForumStore(db *sql.DB) *ForumStore {
-	return &ForumStore{Db: db}
+func NewSiteStore(db *sql.DB) *SiteStore {
+	return &SiteStore{Db: db}
 }
 
-func (s *ForumStore) ListForums() (*tools.Forums, error) {
-	rows, err := s.Db.Query("SELECT * FROM forums")
+func (s *SiteStore) ListSites() (*tools.Sites, error) {
+	rows, err := s.Db.Query("SELECT * FROM sites")
 	if err != nil {
 		return nil, err
 	}
 
 	defer rows.Close()
 
-	var res []*tools.Forum
+	var res []*tools.Site
 	for rows.Next() {
-		var f tools.Forum
+		var f tools.Site
 		if err := rows.Scan(&f.Id, &f.Name, &f.Topic); err != nil {
 			return nil, err
 		}
 		res = append(res, &f)
 	}
 
-	var fullForums []*tools.Forum
+	var fullSites []*tools.Site
 	if res == nil {
-		fullForums = make([]*tools.Forum, 0)
+		fullSites = make([]*tools.Site, 0)
 	} else {
 		for i := 0; i < len(res); i++ {
-			users, err := s.GetForumUsersByID(res[i].Id)
+			users, err := s.GetSiteUsersByID(res[i].Id)
 			if err != nil {
 				return nil, err
 			}
-			fullForum := tools.Forum{
+			fullSite := tools.Site{
 				Id:    res[i].Id,
 				Name:  res[i].Name,
 				Topic: res[i].Topic,
 				Users: users}
-			fullForums = append(fullForums, &fullForum)
+			fullSites = append(fullSites, &fullSite)
 		}
 	}
 
-	result := &tools.Forums{fullForums}
+	result := &tools.Sites{fullSites}
 	return result, err
 }
 
-func (s *ForumStore) FindForumByName(name string) (*tools.Forums, error) {
+func (s *SiteStore) FindSiteByName(name string) (*tools.Sites, error) {
 	var textError string
 	var err error
-	var fullForums []*tools.Forum
+	var fullSites []*tools.Site
 
 	if len(name) == 0 {
-		textError = "Forum name is not provided"
+		textError = "Site name is not provided"
 		err = fmt.Errorf(textError)
-		fullForums = make([]*tools.Forum, 0)
+		fullSites = make([]*tools.Site, 0)
 		return nil, err
 	}
-	rows, err := s.Db.Query(`SELECT * FROM forums where name = $1`, name)
+	rows, err := s.Db.Query(`SELECT * FROM sites where name = $1`, name)
 	if err != nil {
-		textError = "There is no such forum"
+		textError = "There is no such site"
 		err = fmt.Errorf(textError)
 		return nil, err
 	}
 
 	defer rows.Close()
 
-	var res []*tools.Forum
+	var res []*tools.Site
 	for rows.Next() {
-		var f tools.Forum
+		var f tools.Site
 		if err = rows.Scan(&f.Id, &f.Name, &f.Topic); err != nil {
 			return nil, err
 		}
 		res = append(res, &f)
 	}
 	if res == nil {
-		textError = "No such forum"
+		textError = "No such site"
 		err = fmt.Errorf(textError)
 		return nil, err
 	}
 	for i := 0; i < len(res); i++ {
-		users, err := s.GetForumUsersByID(res[i].Id)
+		users, err := s.GetSiteUsersByID(res[i].Id)
 		if err != nil {
 			return nil, err
 		}
-		fullForum := tools.Forum{
+		fullSite := tools.Site{
 			Id:    res[i].Id,
 			Name:  res[i].Name,
 			Topic: res[i].Topic,
 			Users: users}
-		fullForums = append(fullForums, &fullForum)
+		fullSites = append(fullSites, &fullSite)
 	}
 
-	result := &tools.Forums{fullForums}
+	result := &tools.Sites{fullSites}
 	return result, nil
 }
 
-func (s *ForumStore) FindForumByTopic(name string) ([]*tools.Forum, error) {
+func (s *SiteStore) FindSiteByTopic(name string) ([]*tools.Site, error) {
 	if len(name) == 0 {
 		return nil, fmt.Errorf("Topic name is not provided")
 	}
-	rows, err := s.Db.Query(`SELECT * FROM forums where topicKeyword = $1`, name)
+	rows, err := s.Db.Query(`SELECT * FROM sites where topicKeyword = $1`, name)
 	if err != nil {
 		return nil, err
 	}
 
 	defer rows.Close()
 
-	var res []*tools.Forum
+	var res []*tools.Site
 	for rows.Next() {
-		var f tools.Forum
+		var f tools.Site
 		if err := rows.Scan(&f.Id, &f.Name, &f.Topic); err != nil {
 			return nil, err
 		}
 		res = append(res, &f)
 	}
 	if res == nil {
-		res = make([]*tools.Forum, 0)
-		return res, fmt.Errorf("no such forum")
+		res = make([]*tools.Site, 0)
+		return res, fmt.Errorf("no such site")
 	}
 	return res, nil
 }
 
-func (s *ForumStore) CreateForum(name, topicKeyword string) error {
+func (s *SiteStore) CreateSite(name, topicKeyword string) error {
 	if len(name) == 0 {
-		return fmt.Errorf("Forum name is not provided")
+		return fmt.Errorf("Site name is not provided")
 	}
 	if len(topicKeyword) == 0 {
 		return fmt.Errorf("Topic keyword name is not provided")
 	}
-	_, err := s.Db.Exec(`INSERT INTO forums (name, topicKeyword) VALUES ($1, $2)`, name, topicKeyword)
+	_, err := s.Db.Exec(`INSERT INTO sites (name, topicKeyword) VALUES ($1, $2)`, name, topicKeyword)
 	if err != nil {
-		return fmt.Errorf("Forum with this name or topic already exists")
+		return fmt.Errorf("Site with this name or topic already exists")
 	}
-	forums, err := s.FindForumByName(name)
-	_, err = s.Db.Exec(`INSERT INTO usersList (forumsID) VALUES ($1)`, forums.ForumsArr[0].Id)
+	sites, err := s.FindSiteByName(name)
+	_, err = s.Db.Exec(`INSERT INTO usersList (sitesID) VALUES ($1)`, sites.SitesArr[0].Id)
 	return err
 }
 
-func (s *ForumStore) GetForumUsersByID(id int) ([]string, error) {
+func (s *SiteStore) GetSiteUsersByID(id int) ([]string, error) {
 	if id < 1 {
 		return nil, fmt.Errorf("ID is incorrect")
 	}
@@ -154,17 +154,17 @@ func (s *ForumStore) GetForumUsersByID(id int) ([]string, error) {
 	select
 		users.name
 	from
-		forums
+		sites
 	left join
 		usersList
 	on
-		usersList.forumsID = forums.id
+		usersList.sitesID = sites.id
 	left join
 		users
 	on
 		users.id = usersList.userID
 	where
-		forums.id = $1
+		sites.id = $1
 	GROUP BY
 		users.id
 	HAVING users.id is not NULL
@@ -194,7 +194,7 @@ func (s *ForumStore) GetForumUsersByID(id int) ([]string, error) {
 	return res, nil
 }
 
-func (s *ForumStore) AddUserToForum(idForum, idUser int) error {
-	_, err := s.Db.Exec(`INSERT INTO usersList (forumsID, userID) VALUES ($1, $2)`, idForum, idUser)
+func (s *SiteStore) AddUserToSite(idSite, idUser int) error {
+	_, err := s.Db.Exec(`INSERT INTO usersList (sitesID, userID) VALUES ($1, $2)`, idSite, idUser)
 	return err
 }
