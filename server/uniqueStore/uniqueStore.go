@@ -1,4 +1,4 @@
-package generalStore
+package uniqueStore
 
 import (
 	"database/sql"
@@ -7,30 +7,30 @@ import (
 )
 
 type UniqueStore struct {
-	FStore *ForumStore
+	SStore *SiteStore
 	UStore *UserStore
 }
 
-func NewGeneralStore(db *sql.DB) *GeneralStore {
-	fstore := NewForumStore(db)
+func NewUniqueStore(db *sql.DB) *UniqueStore {
+	sstore := NewSiteStore(db)
 	ustore := NewUserStore(db)
-	return &UniqueStore{FStore: fstore, UStore: ustore}
+	return &UniqueStore{SStore: sstore, UStore: ustore}
 }
 
-func (gs *UniqueStore) ListForums() (*tools.Forums, error) {
-	return gs.FStore.ListForums()
+func (gs *UniqueStore) ListSites() (*tools.Sites, error) {
+	return gs.SStore.ListSites()
 }
 
-func (gs *UniqueStore) FindForumByName(name string) (*tools.Forums, error) {
-	return gs.FStore.FindForumByName(name)
+func (gs *UniqueStore) FindSiteByName(name string) (*tools.Sites, error) {
+	return gs.SStore.FindSiteByName(name)
 }
 
 func (gs *UniqueStore) FindUserByName(name string) (*tools.Users, error) {
 	return gs.UStore.FindUserByName(name)
 }
 
-func (gs *UniqueStore) CreateForum(name, topicKeyword string) error {
-	return gs.FStore.CreateForum(name, topicKeyword)
+func (gs *UniqueStore) CreateSite(name, topicKeyword string) error {
+	return gs.SStore.CreateSite(name, topicKeyword)
 }
 
 func (gs *UniqueStore) ListUsers() (*tools.Users, error) {
