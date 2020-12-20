@@ -1,4 +1,4 @@
-const forumsClient = require('./forumsClient');
+const forumsClient = require('./siteUser');
 
 const testData = [
   ['addSite', 'Adding a new site (no topic)', []],
