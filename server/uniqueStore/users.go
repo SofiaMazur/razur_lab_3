@@ -2,7 +2,7 @@ package generalStore
 
 import (
 	"database/sql"
-	"github.com/G-V-G/l3/server/tools"
+	"github.com/SofiaMazur/razur_lab_3/server/tools"
 	_ "github.com/lib/pq"
 )
 
