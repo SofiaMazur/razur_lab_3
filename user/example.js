@@ -1,4 +1,4 @@
-const forumsClient = require('./siteUser');
+const sitesClient = require('./siteUser');
 
 const testData = [
   ['addSite', 'Adding a new site (no topic)', []],
@@ -20,7 +20,7 @@ const sendTestResponses = async () => {
   for (const [ method, comment, args ] of testData)
     try {
       console.log(comment, '\n');
-      const responseFn = forumsClient[method];
+      const responseFn = sitesClient[method];
       const res = await responseFn(...args);
       console.log('Result:')
       console.dir(res, { depth: null })
