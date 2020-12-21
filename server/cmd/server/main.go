@@ -8,7 +8,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/G-V-G/l3/server/db"
+	"github.com/SofiaMazur/razur_lab_3/server/db"
 )
 
 var (
