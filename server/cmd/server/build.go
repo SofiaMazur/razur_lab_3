@@ -2,18 +2,18 @@ package main
 
 import (
 	"github.com/google/wire"
-	gs "github.com/G-V-G/l3/server/generalStore"
-	h "github.com/G-V-G/l3/server/handlers"
+	gs "github.com/SofiaMazur/razur_lab_3/server/uniqueStore"
+	h "github.com/SofiaMazur/razur_lab_3/server/handlers"
 )
 
-var providers = wire.NewSet(gs.NewGeneralStore, h.NewHandler)
+var providers = wire.NewSet(gs.NewUniqueStore, h.NewHandler)
 
 // NewServer generates main forum server
-func NewServer(senv *ServerEnv) (*ForumServer, error) {
+func NewServer(senv *ServerEnv) (*SiteServer, error) {
 	wire.Build(
 		NewDbConnection,
 		providers,
-		wire.Struct(new(ForumServer), "Handlers", "Senv"),
+		wire.Struct(new(SiteServer), "Handlers", "Senv"),
 	)
 
 	return nil, nil
