@@ -16,13 +16,11 @@ var (
 	servHOST = flag.String("h", "localhost", "HTTP host name")
 )
 
-// ServerEnv for port and host
 type ServerEnv struct {
 	Port int
 	Host string
 }
 
-// NewDbConnection gives DB URI
 func NewDbConnection() (*sql.DB, error) {
 	conn := &db.Connection{
 		DbName:     "lab3",
