@@ -7,20 +7,18 @@ import (
 	h "github.com/G-V-G/l3/server/handlers"
 )
 
-// ForumServer runs handlers
-type ForumServer struct {
+type SiteServer struct {
 	server *http.Server
 	Senv *ServerEnv
 	Handlers *h.Handlers
 }
 
-// Run forums server
-func (fs *ForumServer) Run() error {
+func (fs *SiteServer) Run() error {
 	handlersCollection := map[string] http.HandlerFunc {
 		"/users": fs.Handlers.HandleUsers,
-		"/forums": fs.Handlers.HandleForums,
+		"/sites": fs.Handlers.HandleSites,
 		"/user": fs.Handlers.GetUser,
-		"/forum": fs.Handlers.GetForum,
+		"/site": fs.Handlers.GetSite,
 	}
 	for route, handler := range handlersCollection {
 		http.Handle(route, handler)
@@ -31,8 +29,7 @@ func (fs *ForumServer) Run() error {
 	return fs.server.ListenAndServe()
 }
 
-// Close forums server
-func (fs *ForumServer) Close() error {
+func (fs *SiteServer) Close() error {
 	if fs.server == nil {
 		return fmt.Errorf("Server was not started")
 	}
