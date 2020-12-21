@@ -8,12 +8,10 @@ import (
 	"github.com/SofiaMazur/razur_lab_3/server/tools"
 )
 
-// Handlers for server routes
 type Handlers struct {
 	db *gs.UniqueStore
 }
 
-// HandleUsers for POST and GET methods
 func (h *Handlers) HandleUsers(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
 		getUsers(h.db, rw, req)
@@ -24,8 +22,7 @@ func (h *Handlers) HandleUsers(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// HandleForums for POST and GET methods
-func (h *Handlers) HandleForums(rw http.ResponseWriter, req *http.Request) {
+func (h *Handlers) HandleSites(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
 		getSites(h.db, rw, req)
 	} else if req.Method == "POST" {
@@ -35,7 +32,6 @@ func (h *Handlers) HandleForums(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// GetUser for POST method
 func (h *Handlers) GetUser(rw http.ResponseWriter, req *http.Request) {
 	if req.Method != "POST" {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
@@ -53,7 +49,6 @@ func (h *Handlers) GetUser(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// GetSite for POST method
 func (h *Handlers) GetSite(rw http.ResponseWriter, req *http.Request) {
 	if req.Method != "POST" {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
