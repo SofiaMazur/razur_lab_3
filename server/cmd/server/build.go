@@ -8,7 +8,6 @@ import (
 
 var providers = wire.NewSet(gs.NewUniqueStore, h.NewHandler)
 
-// NewServer generates main forum server
 func NewServer(senv *ServerEnv) (*SiteServer, error) {
 	wire.Build(
 		NewDbConnection,
