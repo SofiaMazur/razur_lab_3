@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 	"fmt"
-	h "github.com/G-V-G/l3/server/handlers"
+	h "github.com/SofiaMazur/razur_lab_3/server/handlers"
 )
 
 type SiteServer struct {
